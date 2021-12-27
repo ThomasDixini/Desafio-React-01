@@ -3,6 +3,7 @@ import { useState } from 'react'
 import '../styles/tasklist.scss'
 
 import { FiTrash, FiCheckSquare } from 'react-icons/fi'
+import { Key, ReactChild, ReactFragment, ReactPortal } from 'react';
 
 interface Task {
   id: number;
@@ -15,15 +16,42 @@ export function TaskList() {
   const [newTaskTitle, setNewTaskTitle] = useState('');
 
   function handleCreateNewTask() {
+
     // Crie uma nova task com um id random, não permita criar caso o título seja vazio.
+
+
+    if (!newTaskTitle) return;  // Caso o input esteja vazio, a função não cria uma nova Task
+
+    const newTasks = {
+      id: Math.random(),        // Criei uma nova const para adicionar um id aleatório com Math.Random(), e em 
+      title: newTaskTitle,      // title, passei o newTaskTitle que é aonde está atribuido o valor do input da task.
+      isComplete: false,
+    }
+
+    setTasks(previousState => [...previousState,newTasks])    // seta todas as tasks que já tinha e mais uma nova, que no caso é a const newTasks.
+    
   }
 
   function handleToggleTaskCompletion(id: number) {
     // Altere entre `true` ou `false` o campo `isComplete` de uma task com dado ID
+
+    const newArray = tasks.map(task => task.id == id ? {            // Isso vai mapear cada task do meu tasks[] e me retornar um valor.
+      ...task,                                                      // E como parametro do .map() ele vai pegar um item do meu array tasks, e comparar se o 
+      isComplete: !task.isComplete,                                 // task.id é igual ao id que foi passado na função e caso seja, me retorna o que ja tinha,
+    } : task)                                                       // e sobrescreve a propriedade isComplete: do item negada
+
+    setTasks(newArray)
+
   }
 
   function handleRemoveTask(id: number) {
     // Remova uma task da listagem pelo ID
+
+
+    const filtro = tasks.filter(task => task.id !== id)   // O .filter() vai pegar todas as tasks que não tenham ID = ao parâmetro da função handleRemoveTask.
+    setTasks(filtro)                                      // E como ele pega as tasks diferentes, a setTasks() vai colocar todas as tasks menos a que tenha o ID igual.
+                                                          // Ou seja vai ser a mesma coisa que remover.
+
   }
 
   return (
@@ -46,7 +74,7 @@ export function TaskList() {
 
       <main>
         <ul>
-          {tasks.map(task => (
+          {tasks.map((task: Task) => (
             <li key={task.id}>
               <div className={task.isComplete ? 'completed' : ''} data-testid="task" >
                 <label className="checkbox-container">
